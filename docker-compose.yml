@@ -1,0 +1,34 @@
+services:
+  # Serviço da API
+  api:
+    build: .
+    ports:
+      - "8000:8000"        # porta_do_seu_mac:porta_do_container
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://scheduling:scheduling123@db:5432/scheduling_db
+    depends_on:
+      db:
+        condition: service_healthy    # só sobe a API quando o banco estiver pronto
+    volumes:
+      - .:/app              # sincroniza o código local com o container (hot reload)
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # Serviço do PostgreSQL
+  db:
+    image: postgres:16-alpine        # versão leve do PostgreSQL
+    environment:
+      POSTGRES_USER: scheduling
+      POSTGRES_PASSWORD: scheduling123
+      POSTGRES_DB: scheduling_db
+    ports:
+      - "5432:5432"         # permite conectar ao banco direto do seu Mac
+    volumes:
+      - postgres_data:/var/lib/postgresql/data    # persiste os dados entre restarts
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scheduling -d scheduling_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:            # volume nomeado para persistir os dados do banco
