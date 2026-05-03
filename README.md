@@ -1,5 +1,7 @@
 # Scheduling API
 
+![CI](https://github.com/jacquelinediniz/scheduling-api/actions/workflows/ci.yml/badge.svg)
+
 Multi-tenant scheduling API for businesses built with FastAPI, PostgreSQL and AWS.
 
 ## Tech Stack
