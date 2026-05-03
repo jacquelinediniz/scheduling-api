@@ -5,6 +5,8 @@ from alembic import context
 from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.db.session import Base
+from app.models import tenant, user  # noqa: F401
+from app.models import service, availability, appointment  # noqa: F401
 
 config = context.config
 fileConfig(config.config_file_name)
