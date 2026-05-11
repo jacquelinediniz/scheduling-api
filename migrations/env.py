@@ -1,4 +1,5 @@
 import asyncio
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -13,8 +14,13 @@ fileConfig(config.config_file_name)
 target_metadata = Base.metadata
 
 
+def get_url():
+    """Usa DATABASE_URL do ambiente se disponível, senão usa o alembic.ini."""
+    return os.environ.get("DATABASE_URL") or config.get_main_option("sqlalchemy.url")
+
+
 def run_migrations_offline() -> None:
-    url = config.get_main_option("sqlalchemy.url")
+    url = get_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -26,7 +32,7 @@ def run_migrations_offline() -> None:
 
 
 async def run_migrations_online() -> None:
-    connectable = create_async_engine(config.get_main_option("sqlalchemy.url"))
+    connectable = create_async_engine(get_url())
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
     await connectable.dispose()
